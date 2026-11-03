@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+html{-webkit-text-size-adjust:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Caminho da Terapia da Comunicação - Voz do Ser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: cabeçalho e fundamentos → caminho da sessão (o coração, clicável) → painel do passo → conteúdos complementares em abas que abrem */
+:root{
+  --bg:#0F2340; --surface:#17335C; --ink:#F2FAF9; --muted:#BCD8DD; --line:#2D5480;
+  --p1:#81D8D0; --p1-soft:#1F416E; --ground:#1F416E;
+  --p2:#81D8D0; --p2-soft:#81D8D0;
+  --gold:#E8894D; --gold-text:#F2A877; --on-accent:#0F2340;
+  --display:"Gloock", "Georgia", "Times New Roman", serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  color-scheme:dark;
+}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;display:grid;gap:22px}
+header{display:grid;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-text);font-weight:700}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(32px,5.4vw,52px);line-height:1.05;margin:0;text-wrap:balance;color:var(--ink)}
+.lede{margin:0;color:var(--ink);max-width:64ch}
+h2.sec{font-family:var(--display);font-weight:400;font-size:clamp(24px,3.4vw,32px);margin:0;line-height:1.1}
+.tag{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-text)}
+.kicker{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+
+/* fundamentos */
+.fund{display:grid;gap:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px max(20px,3vw)}
+.fund-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px}
+@media (max-width:780px){.fund-grid{grid-template-columns:1fr}}
+.fcol{display:grid;gap:16px;align-content:start}
+.fblock{display:grid;gap:6px}
+.fblock p{margin:0;max-width:64ch}
+.fblock ul{margin:0;padding-left:18px;display:grid;gap:5px}
+.essencia{background:var(--p1);color:var(--bg);border-radius:12px;padding:18px 20px;display:grid;gap:8px;align-content:start}
+.essencia .kicker{color:var(--bg);opacity:.75}
+.essencia p{margin:0;font-family:var(--display);font-size:21px;line-height:1.3}
+.formato{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.formato div{background:var(--bg);border-radius:12px;padding:12px 14px;display:grid;gap:2px}
+.formato b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--p2)}
+.formato span{font-family:var(--display);font-size:19px;line-height:1.25}
+.formato .warn{background:var(--gold);color:var(--on-accent)}
+.formato .warn b{color:var(--on-accent);opacity:.85}
+
+/* caminho */
+.trail-box{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.scroller{overflow-x:auto;overflow-y:hidden;cursor:grab;scrollbar-width:thin}
+.scroller.dragging{cursor:grabbing;user-select:none}
+.scroller:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+#trail{display:block;height:400px}
+.hint{position:absolute;right:14px;bottom:10px;font-size:12px;color:var(--muted);pointer-events:none;background:var(--surface);padding:2px 8px;border-radius:99px}
+.path-faint{fill:none;stroke:var(--line);stroke-width:2;stroke-dasharray:2 7;stroke-linecap:round}
+.path-walk{fill:none;stroke:var(--p2);stroke-width:3;stroke-linecap:round;opacity:.6}
+.ground{fill:var(--ground);opacity:.6}
+.step{cursor:pointer;transition:opacity .35s}
+.step:focus{outline:none}
+.step.future{opacity:.3}
+.halo{fill:none;stroke:var(--gold);stroke-width:2.5;opacity:0}
+.step.current .halo{opacity:1}
+.step:focus-visible .halo{opacity:1;stroke:var(--ink)}
+.foot{fill:var(--p1)}
+.foot2{fill:var(--p2)}
+.bub{fill:var(--surface);stroke:var(--p1);stroke-width:1.5}
+.step.current .bub{fill:var(--gold);stroke:var(--gold)}
+.num{font-size:12px;font-weight:700;text-anchor:middle;fill:var(--ink);pointer-events:none}
+.step.current .num{fill:var(--on-accent)}
+.sname{font-size:11px;font-weight:600;text-anchor:middle;fill:var(--ink);pointer-events:none}
+.step:hover .sname{fill:var(--gold)}
+.marco circle.dot{fill:var(--surface);stroke:var(--gold);stroke-width:3}
+.marco.current circle.dot{fill:var(--gold)}
+.marco .mtxt{font-size:12px;font-weight:700;text-anchor:middle;fill:var(--gold-text);letter-spacing:.06em;text-transform:uppercase}
+#marker line{stroke:var(--gold);stroke-width:1.5}
+#marker rect{fill:var(--gold)}
+#marker text{fill:var(--on-accent);font-size:13px;font-weight:600}
+#marker circle{fill:var(--gold)}
+.walker-row{display:flex;align-items:center;gap:12px}
+.walker-row input{flex:1;min-width:0;accent-color:var(--gold);height:28px}
+.btn{font:inherit;font-weight:600;font-size:14px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:99px;width:40px;height:40px;cursor:pointer;flex:none;display:grid;place-items:center}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* painel */
+.panel{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:820px){.panel{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 24px;display:grid;gap:16px;min-width:0}
+.where{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.where b{color:var(--ink)}
+.lesson{font-family:var(--display);font-weight:400;font-size:clamp(28px,3.8vw,38px);line-height:1.08;margin:0;text-wrap:balance}
+.sub{margin:0;color:var(--muted);font-size:15px}
+.content{display:grid;gap:16px}
+.content p{margin:0;max-width:68ch}
+.content h4{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.content .grp{display:grid;gap:8px}
+.content ul,.content ol{margin:0;padding-left:20px;display:grid;gap:6px;max-width:70ch}
+.content ol li::marker{color:var(--gold);font-weight:700}
+.call{border-radius:12px;padding:12px 16px;display:grid;gap:4px;background:var(--p1-soft)}
+.call b{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--p2)}
+.call p{font-family:var(--display);font-size:18px;line-height:1.35}
+.call.att{background:var(--gold);color:var(--on-accent)}
+.call.att b{color:var(--on-accent);opacity:.85}
+.niveis{display:grid;gap:6px}
+.niveis div{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;border-radius:10px;padding:10px 12px;background:var(--bg)}
+.niveis div:first-child{background:var(--p1);color:var(--bg)}
+.niveis div:first-child span{color:var(--bg);opacity:.85}
+.niveis i{font-style:normal;font-family:var(--display);font-size:22px;line-height:1;color:var(--gold)}
+.niveis b{display:block}
+.niveis span{font-size:14px;color:var(--muted)}
+.nomes{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.nomes div{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-family:var(--display);font-size:17px;line-height:1.3}
+.nomes em{font-style:normal;color:var(--gold)}
+.dpara{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;max-width:520px}
+.dpara div{border-radius:12px;padding:12px;text-align:center;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px}
+.dpara .de{background:var(--bg);color:var(--muted)}
+.dpara .para{background:var(--p1);color:var(--bg)}
+.dpara span{font-size:22px;color:var(--gold)}
+.side{display:grid;gap:14px}
+.side h2{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;border-radius:99px;padding:5px 11px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--gold)}
+.chip:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.chip b{color:var(--gold)}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.next{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+.next b{color:var(--ink)}
+.next button{font:inherit;font-weight:700;background:var(--gold);color:var(--on-accent);border:0;border-radius:99px;padding:8px 16px;cursor:pointer;margin-top:10px}
+.next button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* complementares */
+.extras{display:grid;gap:12px}
+.extras-head{display:grid;gap:4px;margin-top:10px}
+details.ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+details.ex>summary{list-style:none;cursor:pointer;padding:18px 22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 14px;align-items:center}
+details.ex>summary::-webkit-details-marker{display:none}
+details.ex>summary:hover{background:var(--p1-soft)}
+details.ex>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+.ex-t{font-family:var(--display);font-size:clamp(20px,2.6vw,26px);line-height:1.15}
+.ex-s{font-size:14px;color:var(--muted);grid-column:1}
+.ex-ic{grid-row:1 / span 2;grid-column:2;width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--on-accent);display:grid;place-items:center;transition:transform .3s}
+.ex-ic svg{width:18px;height:18px}
+details.ex[open] .ex-ic{transform:rotate(180deg)}
+.ex-body{padding:4px 22px 24px;display:grid;gap:18px;border-top:1px solid var(--line);padding-top:20px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.box{background:var(--bg);border-radius:12px;padding:16px 18px;display:grid;gap:8px;align-content:start}
+.box h4{margin:0;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--p2);font-weight:700}
+.box p{margin:0}
+.box ul,.box ol{margin:0;padding-left:18px;display:grid;gap:5px}
+.box.dark{background:var(--p1);color:var(--bg)}
+.box.dark h4{color:var(--bg);opacity:.8}
+.box.orange{background:var(--gold);color:var(--on-accent)}
+.box.orange h4{color:var(--on-accent);opacity:.85}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab{font:inherit;font-size:14px;font-weight:600;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:99px;padding:7px 16px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--p1);color:var(--bg);border-color:var(--p1)}
+.tab:hover{border-color:var(--gold)}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.tabbody{display:grid;gap:14px}
+.tabbody .big{font-family:var(--display);font-size:clamp(26px,3.6vw,34px);margin:0;line-height:1.1}
+.slogan{margin:0;font-family:var(--display);font-size:19px;line-height:1.35;border-left:3px solid var(--gold);padding-left:14px;max-width:62ch}
+.vals{display:flex;flex-wrap:wrap;gap:6px}
+.vals span{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--p2-soft);color:var(--ink);border-radius:99px;padding:5px 12px}
+.note{margin:0;font-size:14px;color:var(--muted)}
+.fim{background:var(--p1);color:var(--bg);border-radius:16px;padding:32px max(20px,4vw);display:grid;gap:10px;text-align:center;justify-items:center}
+.fim p{margin:0;font-family:var(--display);font-size:clamp(22px,3.4vw,32px);line-height:1.25;max-width:30ch}
+.fim span{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#F09A62}
+
+/* layout: azul-marinho como base, tiffany para destaques, laranja para marcações */
+h1{color:var(--p1)}
+.fund{background:transparent;border:0;border-top:2px solid var(--p1);border-radius:0;padding:22px 0 0}
+h2.sec{color:var(--ink)}
+.formato div{background:var(--surface);color:var(--ink)}
+.formato b{color:var(--p1)}
+.formato .warn{background:var(--gold);color:var(--on-accent)}
+.formato .warn b{color:var(--on-accent)}
+.essencia{background:var(--surface);color:var(--ink);border-left:4px solid var(--p1)}
+.essencia .kicker{color:var(--p1);opacity:1}
+.trail-box{background:var(--surface);border:0;border-radius:18px}
+.hint{background:var(--surface);color:var(--muted)}
+.path-faint{stroke:#4C7DA8}
+.path-walk{stroke:var(--p1);opacity:.85}
+.ground{fill:var(--ground);opacity:1}
+.foot{fill:var(--p1)}
+.foot2{fill:var(--gold)}
+.bub{fill:var(--bg);stroke:var(--p1)}
+.num{fill:var(--ink)}
+.sname{fill:var(--ink)}
+.step:hover .sname{fill:var(--gold-text)}
+.halo{stroke:var(--gold)}
+.step:focus-visible .halo{stroke:var(--ink)}
+.marco circle.dot{fill:var(--bg);stroke:var(--gold)}
+.marco .mtxt{fill:var(--gold-text)}
+.btn{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.btn:hover{background:var(--gold);border-color:var(--gold);color:var(--on-accent)}
+.card{background:var(--surface);border:0;border-radius:18px}
+.card.side{border-left:4px solid var(--gold)}
+.lesson{color:var(--p1)}
+.where b{color:var(--ink)}
+.sub{color:var(--muted)}
+.call{background:var(--p1-soft)}
+.call b{color:var(--p1)}
+.call.att{background:var(--gold);color:var(--on-accent)}
+.call.att b{color:var(--on-accent);opacity:.85}
+.niveis div{background:var(--p1-soft);color:var(--ink)}
+.niveis div:first-child{background:var(--p1-soft);color:var(--ink);box-shadow:inset 3px 0 0 var(--gold)}
+.niveis div:first-child span,.niveis span{color:var(--muted);opacity:1}
+.nomes div{border-color:var(--p1);background:var(--p1-soft)}
+.nomes em{color:var(--gold-text)}
+.dpara .de{background:var(--p1-soft);color:var(--ink)}
+.dpara .para{background:var(--p1);color:var(--on-accent)}
+.chip{background:var(--p1-soft);color:var(--ink);border-color:var(--line)}
+.chip b{color:var(--gold-text)}
+.next b{color:var(--ink)}
+details.ex{background:var(--surface);border:0;border-radius:18px}
+details.ex>summary:hover{background:var(--p1-soft)}
+.ex-t{color:var(--ink)}
+.box{background:var(--p1-soft);color:var(--ink)}
+.box h4{color:var(--p1)}
+.box.dark{background:var(--p1-soft);color:var(--ink);border-left:4px solid var(--p1)}
+.box.dark h4{color:var(--p1);opacity:1}
+.box.orange{background:var(--gold);color:var(--on-accent)}
+.box.orange h4{color:var(--on-accent)}
+.tab{border-color:var(--p1);background:transparent;color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--p1);color:var(--on-accent);border-color:var(--p1)}
+.tabbody .big{color:var(--p1)}
+.vals span{background:transparent;color:var(--p1);border:1px solid var(--p1)}
+.fim{background:var(--surface);color:var(--ink)}
+.fim span{color:var(--gold-text)}
+.content ol li::marker{color:var(--gold-text)}
+.ex-ic{background:var(--gold);color:var(--on-accent)}
+.lnk{font:inherit;font-size:13px;font-weight:700;background:var(--gold);color:var(--on-accent);border:0;border-radius:99px;padding:2px 10px;margin-left:4px;cursor:pointer}
+.lnk:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.arq-fase{margin:0;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-text)}
+.arq-def{margin:0;font-family:var(--display);font-size:clamp(20px,2.6vw,26px);line-height:1.35;max-width:58ch}
+.arq-q{display:grid;gap:6px}
+.arq-q p{margin:0;font-family:var(--display);font-size:20px;color:var(--p1)}
+.arq-quote{margin:0;font-family:var(--display);font-size:18px;line-height:1.5;max-width:70ch;border-left:3px solid var(--p1);padding-left:16px}
+.arq-quote cite{display:block;font-family:var(--body);font-style:normal;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-text);margin-top:8px}
+.arq-final{background:var(--p1);color:var(--on-accent);border-radius:14px;padding:22px;text-align:center;display:grid;gap:4px}
+.arq-final b{font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.arq-final p{margin:0;font-family:var(--display);font-size:clamp(22px,3vw,30px);line-height:1.2}
+.subtabs{display:flex;flex-wrap:wrap;gap:6px}
+.tab.sub{font-size:13px;padding:6px 14px;border-style:dashed}
+.tab.sub[aria-selected="true"]{border-style:solid}
+.dpara2{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:12px;align-items:center}
+.dpara2>span{font-size:28px;color:var(--gold)}
+@media (max-width:640px){.dpara2{grid-template-columns:1fr}.dpara2>span{justify-self:center;transform:rotate(90deg)}}
+@media (prefers-reduced-motion: reduce){ .step,.ex-ic{transition:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Escola Voz do Ser</div>
+    <h1>Caminho da Terapia da Comunicação</h1>
+    <p class="lede">As 8 etapas de um atendimento, do acolhimento à finalização, e o cuidado que continua depois. Clique em qualquer passo do caminho para ver o que acontece nele e o que o terapeuta busca naquele momento.</p>
+  </header>
+
+  <section class="fund" aria-labelledby="fundT">
+    <div><div class="tag">Fundamentos</div><h2 class="sec" id="fundT">Entendendo a Terapia da Comunicação</h2></div>
+    <div class="fund-grid">
+      <div class="fcol">
+        <div class="fblock"><h3 class="kicker">O que é</h3><p>Um atendimento individual ou em dupla (casal, pais e filhos, sócios) com dois terapeutas que se valem de técnicas integrativas e, por meio da comunicação, trazem ao consciente as crenças basais, antropológicas e familiares, com acesso à correspondente cura mental e prática.</p></div>
+        <div class="fblock"><h3 class="kicker">Como é</h3><ul><li>Análise da mentalidade atual, por meio de ferramentas investigativas e meditativas.</li><li>Exposição do sistema de pensamento vigente e de suas decorrências nas expressões e nos relacionamentos.</li><li>Resolução correspondente de cada crença limitante apresentada e treinamento mental personalizado.</li></ul></div>
+        <div class="fblock"><h3 class="kicker">Por quê</h3><p>Todas as crenças limitantes vêm da ideia de que somos indivíduos separados e desconectados entre nós e da nossa energia vital. A comunicação, quando acontece de fato, nos convida a fazer contato com o que há de comum em nós, desfazendo as crenças que nos limitam.</p></div>
+      </div>
+      <div class="fcol">
+        <div class="essencia"><h3 class="kicker">Em essência</h3><p>“A comunicação, quando acontece de fato, nos reconecta com o nosso propósito abundante e feliz.”</p></div>
+        <div class="fblock"><h3 class="kicker">Pra quem</h3><ul><li>Para quem quer conhecer o seu verdadeiro propósito e saber como exercê-lo.</li><li>Para quem quer autoconhecimento na vida profissional e pessoal.</li><li>Para quem quer se comunicar de forma mais sincera, assertiva e condizente com quem realmente é.</li><li>Para quem quer resolver os conflitos internos que embarreiram sua paz.</li><li>Para quem quer curar uma dor ou a maneira como se vê e se expressa.</li><li>Para quem quer entrar em contato com quem realmente é e se permitir ser acolhido, visto e ouvido.</li></ul></div>
+      </div>
+    </div>
+    <div class="formato">
+      <div><b>Formato</b><span>Atendimento em dupla de terapeutas</span></div>
+      <div><b>Duração</b><span>2 horas na primeira sessão · 1 hora nas próximas</span></div>
+      <div><b>Pré-terapia</b><span>Boas-vindas e acolhimento por mensagem</span></div>
+      <div class="warn"><b>Atenção</b><span>Nunca passe treino antes da sessão.</span></div>
+    </div>
+  </section>
+
+  <div style="display:grid;gap:6px;margin-top:6px">
+    <div class="tag">Passo a passo</div>
+    <h2 class="sec">O caminho da sessão</h2>
+    <p class="lede">Clique num passo para ir direto a ele, arraste o caminho ou use a régua abaixo. Os passos já percorridos ficam marcados, e o painel mostra o que a sessão já atravessou até ali.</p>
+  </div>
+
+  <div class="trail-box">
+    <div class="scroller" id="scroller" tabindex="0" aria-label="Caminho da sessão. Use as setas para caminhar.">
+      <svg id="trail" xmlns="http://www.w3.org/2000/svg" role="group">
+        <defs>
+          <symbol id="foot" viewBox="0 0 30 60">
+            <path d="M14 21 C22 20 26 28 25.5 38 C25 49 21 58 15 58 C9.5 58 6.5 52 6.5 45 C6 37 4.5 31 6 26 C7.2 22.5 10 21.2 14 21Z"/>
+            <circle cx="8.5" cy="14" r="4.3"/><circle cx="15" cy="10.6" r="3.2"/><circle cx="20.2" cy="11.8" r="2.8"/><circle cx="24.2" cy="15" r="2.4"/><circle cx="26.8" cy="19.6" r="2"/>
+          </symbol>
+        </defs>
+        <g id="groundG"></g>
+        <path id="faint" class="path-faint"/>
+        <path id="walk" class="path-walk"/>
+        <g id="steps"></g>
+        <g id="marker" aria-hidden="true"><line/><circle r="3"/><rect rx="6"/><text/></g>
+      </svg>
+    </div>
+    <div class="hint">clique num passo ou arraste ↔</div>
+  </div>
+
+  <div class="walker-row">
+    <button class="btn" id="prev" aria-label="Passo anterior">←</button>
+    <input type="range" id="range" min="0" value="2" aria-label="Caminhar pela sessão">
+    <button class="btn" id="next" aria-label="Próximo passo">→</button>
+  </div>
+
+  <section class="panel" aria-live="polite">
+    <div class="card">
+      <div class="where" id="where"></div>
+      <h2 class="lesson" id="lesson"></h2>
+      <p class="sub" id="sub"></p>
+      <div class="content" id="content"></div>
+    </div>
+    <div class="card side">
+      <h2>A sessão já passou por</h2>
+      <div id="carry"></div>
+      <div class="next" id="nextline"></div>
+    </div>
+  </section>
+
+  <div class="extras-head">
+    <div class="tag">Conteúdos complementares</div>
+    <h2 class="sec">Para apoiar o terapeuta</h2>
+    <p class="lede">Clique em cada tema para abrir.</p>
+  </div>
+
+  <div class="extras">
+    <details class="ex" id="ex-prep">
+      <summary><span class="ex-t">Como se preparar para o atendimento</span><span class="ex-s">Atendimentos presenciais e online</span><span class="ex-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="ex-body">
+        <div class="two">
+          <div class="box"><h4>Atendimentos presenciais</h4><ul><li>Chegue com 30 minutos de antecedência.</li><li>Verifique a estrutura que utilizará para o atendimento.</li><li>Alinhe-se com seu parceiro antes do início da sessão.</li></ul><p>Os recepcionistas organizam a sala, garantindo que esteja limpa, organizada, com jarra de água, copos e lenços de papel, e recebem o paciente com cordialidade. Verifique com o(a) recepcionista do dia qual sala está reservada (sem recepcionista, pergunte à secretária pelo WhatsApp). Separe os materiais necessários e confira se tudo está disponível e acessível.</p></div>
+          <div class="box"><h4>Atendimentos online</h4><ul><li>Confira câmera, áudio e iluminação.</li><li>Evite filtros, especialmente os que desfocam a imagem.</li><li>Posicione a câmera na altura dos olhos.</li><li>Mantenha o enquadramento mostrando tronco e gestos.</li><li>Evite porta ou elementos distrativos ao fundo.</li><li>Verifique se tudo está disponível, organizado e acessível.</li><li>Conecte-se 30 minutos antes para se alinhar com seu parceiro de atendimento e testar câmera e áudio.</li></ul></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="ex" id="ex-imagem">
+      <summary><span class="ex-t">Imagem profissional</span><span class="ex-s">O que vestimos comunica o cuidado e o profissionalismo que dedicamos a cada pessoa</span><span class="ex-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="ex-body">
+        <div class="two">
+          <div class="box"><h4>Partes de baixo</h4><p><b>Funciona:</b> calças de alfaiataria, sarja (chino) ou jeans sem rasgos, saias midi ou pantacourt.</p><p><b>Evitar:</b> shorts, bermudas casuais e minissaias.</p></div>
+          <div class="box"><h4>Partes de cima</h4><p><b>Funciona:</b> camisas sociais, polos, blusas de tecido plano, tricôs leves ou camisetas básicas.</p><p><b>Evitar:</b> regatas cavadas, decotes acentuados, transparências ou abdômen à mostra.</p></div>
+          <div class="box"><h4>Calçados</h4><p><b>Funciona:</b> sapatos sociais, sapatilhas, mocassins, sapatênis ou tênis limpos.</p><p><b>Evitar:</b> chinelos de borracha e pantufas.</p></div>
+        </div>
+        <div class="box dark"><h4>Em poucas palavras</h4><p style="font-family:var(--display);font-size:19px;line-height:1.35">Vista-se como quem acolhe com seriedade: confortável, cuidado(a) e alinhado(a) ao espaço de escuta que oferecemos.</p></div>
+      </div>
+    </details>
+
+    <details class="ex" id="ex-cuidado">
+      <summary><span class="ex-t">Cuidado e segurança no atendimento</span><span class="ex-s">Condutas diante de situações inadequadas e Ouvidoria</span><span class="ex-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="ex-body">
+        <div class="two">
+          <div class="box"><h4>Condutas diante de situações inadequadas</h4><p>Caso o paciente apresente qualquer comportamento que gere desconforto, insegurança ou ultrapasse limites:</p><ol><li>Demonstre imediatamente que o comportamento não é adequado.</li><li>Abra a porta da sala e chame alguém da equipe, se necessário.</li><li>Informe com clareza que você não se sentiu confortável.</li><li>Finalize a sessão ou a conversa.</li></ol><p>Esses passos descrevem uma conduta ideal. Sabemos que muitas vezes não conseguimos agir ou reunir forças nesse momento. Para isso, acione a Supervisão Clínica e/ou a Ouvidoria. O importante é que você seja acolhido e guiado, de mãos dadas, aos próximos passos.</p></div>
+          <div class="box"><h4>Ouvidoria · canal direto</h4><p>Caso você vivencie, perceba ou tenha dúvidas sobre situações de assédio moral ou sexual, desconforto ou questões éticas envolvendo o time ou pacientes, recorra imediatamente à Ouvidoria do Voz do Ser pelo e-mail <b>ouvidoria@vozdoser.com.br</b>, ou fale diretamente com a Sabrina Nask.</p></div>
+        </div>
+        <div class="box orange"><h4>Cuidar de quem cuida</h4><p>Você será acolhido(a), orientado(a) e acompanhado(a) ao longo dos próximos passos, com o suporte necessário para cada situação. Você não está sozinho(a) e não deve sustentar situações de risco ou desconforto. Cuidar de quem cuida é um valor para o nosso time.</p></div>
+      </div>
+    </details>
+
+    <details class="ex" id="ex-arq">
+      <summary><span class="ex-t">Arquétipos</span><span class="ex-s">O conceito de arquétipo, os personagens que interpretamos e a saída de cada um</span><span class="ex-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="ex-body">
+        <div class="tabs" id="tabsA" role="tablist" aria-label="Arquétipos"></div>
+        <div class="tabbody" id="bodyA" aria-live="polite"></div>
+      </div>
+    </details>
+
+    <details class="ex" id="ex-feridas">
+      <summary><span class="ex-t">Feridas emocionais</span><span class="ex-s">Rejeição, traição, abandono, humilhação e injustiça</span><span class="ex-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="ex-body">
+        <p class="note" style="color:var(--ink);max-width:72ch">Embora as 5 sensações que estudamos sejam muito basais, olhamos para as feridas emocionais considerando-as como arquétipos, no nível 2 de crenças, já que ditam muitos comportamentos e bases de pensamento.</p>
+        <div class="tabs" id="tabsF" role="tablist" aria-label="Feridas emocionais"></div>
+        <div class="tabbody" id="bodyF" aria-live="polite"></div>
+        <p class="note">Leitura complementar: livro “As cinco feridas emocionais: Como superar os sentimentos que impedem a sua felicidade”, de Lise Bourbeau.</p>
+      </div>
+    </details>
+
+    <details class="ex" id="ex-perfis">
+      <summary><span class="ex-t">Perfis de comunicação</span><span class="ex-s">Amigável, analítico, dominador e expressivo, e como lidar com cada um</span><span class="ex-ic" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+      <div class="ex-body">
+        <div class="tabs" id="tabsP" role="tablist" aria-label="Perfis de comunicação"></div>
+        <div class="tabbody" id="bodyP" aria-live="polite"></div>
+      </div>
+    </details>
+  </div>
+
+  <section class="fim"><span>Voz do Ser · A voz de quem realmente somos</span><p>“A busca termina aqui, você é o que você sempre buscou.”</p></section>
+</div>
+
+<script>
+(function(){
+const NS="http://www.w3.org/2000/svg";
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const call=(t,x,att)=>`<div class="call${att?" att":""}"><b>${t}</b><p>${x}</p></div>`;
+const S=[
+ {k:"pre",tipo:"marco",nome:"Pré-terapia",curto:"Pré-terapia",sub:"Antes da sessão",
+  html:`<p>Dê boas-vindas e acolhimento por mensagem.</p>${call("Atenção","Nunca passe treino antes da sessão.",1)}`},
+ {n:1,nome:"Receber a pessoa",curto:"Receber",sub:"Criar a egrégora do atendimento",
+  html:`<div class="grp"><h4>Egrégora</h4><ul><li>Qualidade de pensamentos;</li><li>Qualidade de relacionamento;</li><li>Ambiente;</li><li>Tratativa: profissionalismo, visão rápida e muita elevação de autoconceito;</li><li>Conversas amenas, leves, só tirando o medo.</li></ul></div>${call("Lembre-se","A sessão só começa quando a gente avisa a pessoa tudo o que vai acontecer.")}`},
+ {n:2,nome:"Investigação",curto:"Investigação",sub:"O que estamos buscando ao investigar?",
+  html:`<ol><li>Entender o que trouxe a pessoa aqui (comigo, na minha frente, no meu consultório, na nossa metodologia…);</li><li>Entender quais são as queixas;</li><li>Entender os desejos;</li><li>Entender quais são as decorrências dessas queixas (trabalho, relacionamentos, autoestima, dinheiro, família…);</li><li>Descobrir o <b>arquétipo</b> (personagem); <button class="lnk" data-open="ex-arq">ver os arquétipos ↓</button></li><li>Descobrir a <b>crença pessoal</b> (se… alguma coisa; perguntar sobre a referência de comportamento; nomear o comportamento, a melhor e a pior coisa disso; nomear onde ela quer chegar, a melhor e a pior coisa disso);</li><li>Descobrir a <b>crença basal</b> (workshop: o que eu penso sobre mim, crise de identidade, o que eu penso sobre o outro, meta particular, controle, posse, defesa da própria personalidade, medo basal, julgamento, apego ao passado, excesso de significados para justificar sua história, vontade de não entendimento, culpa, dificuldade de perdão, indivíduo).</li></ol>
+  ${call("Dica","Se a pessoa não sabe o que veio fazer: visualiza a sua vida, de cima, todas as áreas e todos os relacionamentos. Qual lugar você quer mudar? Onde você gostaria que fosse diferente?")}
+  <div class="grp"><h4>Níveis de crenças</h4><div class="niveis"><div><i>4</i><p><b>Crenças basais</b><span>Indivíduo, o “relacionamento” com Deus, o que dita sua sensação interna.</span></p></div><div><i>3</i><p><b>Crenças antropológicas</b><span>Equivalente ao inconsciente coletivo, arquétipos, cultura.</span></p></div><div><i>2</i><p><b>Crenças familiares</b><span>Defesas de um brasão; ditam a frequência, os interesses, as prioridades.</span></p></div><div><i>1</i><p><b>Crenças pessoais</b><span>Suas especificidades egoicas, seu jeitinho, suas expressões.</span></p></div></div></div>
+  <div class="grp"><h4>Regras para investigar</h4><ol><li>É ela que dá o tom;</li><li>Perguntas claras e despretensiosas;</li><li>Ouvir a resposta antes de formular a próxima pergunta;</li><li>Perguntar sobre um aspecto da resposta;</li><li>Depois que você entendeu, pare de perguntar e mude de assunto bruscamente;</li><li>É um quebra-cabeça: você não precisa ligar todas as peças, deve fazer joguinhos de peças antes de conectar tudo;</li><li>Escolha um adjetivo do momento e um ideal sobre a queixa trazida, e pergunte o que é pior/melhor e depois o que é melhor/pior;</li><li>Se a pessoa tiver dificuldade, faça perguntas de múltipla escolha, peça “bate-bola”, “complete a frase…”, cite alguém ou uma referência que tenha isso;</li><li>Qual é a referência desse comportamento, ou o que seria ideal, quem é o ideal, quem ela não gostaria de copiar de jeito nenhum;</li><li>Anote padrões de expressividade.</li></ol></div>
+  <div class="grp"><h4>Lidando com resistências na investigação</h4><ol><li>Contextualizar (o porquê da pergunta) caso a pessoa seja cética;</li><li>Contar o segredo/conteúdo para a pessoa (geralmente…) caso entre em defesa;</li><li>Acolher, sem dar a saída, caso ela entre em sofrimento;</li><li>Entender e aceitar, caso a pessoa entre em negação;</li><li>Colocar em estado meditativo, de olhos fechados, caso ela fale muito “não sei”; ou “pode pensar, essa sessão é pra você, tome o tempo que precisar”; ou “se você soubesse, o que você falaria?”; ou “se eu perguntasse para alguém do seu convívio, o que essa pessoa falaria?”;</li><li>Em caso de resistência por ser prolixo: “agora eu vou fazer um de frente com a Gabi”; “é como se fosse…”, e você mesmo resume o que a pessoa disse sem nenhum juízo de valor. Ou peça para ela falar isso em uma frase, uma palavra ou um lugar do corpo em que sente isso;</li><li>Se ela não for clara sobre o que sente, acione o cuidador que há na paciente: “eu não tô entendendo exatamente”; “me ajuda a entender uma coisa aqui…”; “acho que eu fiquei confuso…”;</li><li>Quando a pessoa “traz o diagnóstico”, isso é um sintoma. Ela nunca sabe o diagnóstico, só sabe os sintomas, e é sempre você que fecha o diagnóstico.</li></ol></div>`},
+ {n:3,nome:"Identificação",curto:"Identificação",sub:"Reconhecer o que foi encontrado",
+  html:`${call("Dica","Se você sabe todos os níveis de crença, é ela! Se você sabe o ciclo que a pessoa faz (sensação, cena, comportamento), pode falar.")}${call("Pausa para alinhar com a dupla","Caso seja necessário, peça uma pausa ao paciente: convide-o a ir ao banheiro ou a tomar um chá na recepção, e use 5 minutos para se alinhar com a sua dupla sobre o que vão expor a ele.")}`},
+ {n:4,nome:"Exposição do sistema atual",curto:"Exposição",sub:"Pseudoganhos e modus operandi",
+  html:`${call("Dica","Recapitule o que ela disse, em resumo, agora conectando os pontos. O paciente nunca sabe o próprio diagnóstico: caso ele diga um, trate só como sintoma! Faça ciclos (quando você se sente assim, passa a fazer isso, aí sente tal coisa e volta pra isso aqui).")}
+  <p>Faça perguntas para ver se ela está entendendo, se está acompanhando a linha de raciocínio: “Tem alguém que vem em mente quando a gente fala isso pra você?” · “Vieram cenas na sua cabeça quando eu falei isso?”</p>
+  <p>Tenha paciência quando a pessoa se identificar e der exemplos. Melhor o exemplo dela mesma do que os seus.</p>
+  <div class="grp"><h4>Revele o nome que isso tem</h4><div class="nomes"><div>“Isso no mundo se chama… <em>vingança</em>”</div><div>“Aqui nós chamamos isso de… <em>controle</em>”</div><div>“Isso seria uma mentalidade de… <em>pedinte</em>”</div></div></div>
+  <div class="grp"><h4>Exponha as consequências</h4><p>Exponha as consequências disso nas áreas da vida e nas sensações. Pergunte:</p><ul><li>“Faz sentido pra você?”</li><li>“Tem alguma coisa que você pensou ouvindo isso?”</li><li>“Tem alguém que vem na sua cabeça quando a gente fala disso?”</li><li>“O que eu tô falando combina com o que você tá sentindo?”</li><li>“É correto dizer que…”</li><li>“Você começa achando que não vai ser ouvido… aí você falou que faz tal coisa, então você sente…”</li></ul></div>`},
+ {n:5,nome:"Ponte cultural",curto:"Ponte",sub:"A ponte entre sistemas",
+  html:`<p>É a ponte entre o sistema de pensamento da pessoa e a saída na realidade. Visualmente, a pessoa precisa entender o benefício de abandonar o jeito atual para investir em uma nova cultura de pensamento.</p>
+  <div class="dpara"><div class="de">De</div><span aria-hidden="true">→</span><div class="para">Para</div></div>
+  <p>Necessariamente tem um <b>de → para</b>. Nessa hora, você já expôs o sistema vigente; agora precisa ajudar a pessoa a ver que a resposta já está nela, e vai descobrir a ferramenta que ela consegue usar para fazer as “comparações”. Peça para a pessoa dar a correlação da saída.</p>
+  ${call("Exemplo","“Se você não se vinga, você se motivaria pelo quê?” · “Você disse que não queria mais se sentir presa: quem não é presa, é o quê?”")}
+  <p>Escreva os dois nomes em lados opostos. Faça perguntas abertas e fechadas para deixar claro o que sente e como age quem está de um lado e quem está do outro, em sequência, seguida de uma explicação: o tal sente isso, o outro sente aquilo; tal sensação vem de onde; se você estivesse no outro posicionamento, o que faria.</p>
+  <div class="grp"><h4>Se ela não souber descrever os dois lados</h4><p>Peça para fechar os olhos e descreva você toda a saída, e veja se ela quer a sensação. Ou descreva a treta (veja a sensação), depois descreva a saída (veja a sensação), sempre verificando se de fato ela chegou na sensação. Depois veja o que ela prefere. Assim, ela receberá um treino para não esquecer disso que ela quer.</p></div>`},
+ {n:6,nome:"Treinamento mental",curto:"Treino mental",sub:"É o próprio pedido do workshop",
+  html:`<p>É um pedido para Deus, mesmo que a pessoa não saiba: a linguagem é a que Deus entende e o que o Ser quer.</p>
+  <p>Use palavras que ela deseja sentir na parte da ponte cultural da saída. Considere as palavras que ela usou e que ela aceita. Use expressões como: <b>me liberto, eu abandono, me abro, quero conhecer, me comprometo, eu autorizo…</b> Tudo com cara de decisão.</p>
+  <p>Peça para ela ler em voz alta. Peça para fechar os olhos e ouvir você lendo o treinamento mental com trilha sonora. Deixe chegar no coração.</p>
+  ${call("Importante","Só comece o treinamento prático depois que a pessoa sentiu o mental e te deu o feedback dele.",1)}`},
+ {n:7,nome:"Treinamento prático",curto:"Treino prático",sub:"A prática do treinamento mental",
+  html:`<p>Pode ser outra frase que resume o treinamento mental, ou uma nova possibilidade de como fazer em umas 2 ou 3 situações que a pessoa trouxe.</p>
+  <ul><li>É a prática do treinamento mental que já foi dado: exemplo do que fazer de fato, com fala, corpo, pensamento, respiração, relacionamento.</li><li>É uma postura mental que a pessoa pode pensar diante de alguém ou de alguma situação.</li></ul>
+  ${call("Atenção","Treinamento prático não é ordem de conduta. É o momento em que o paciente entende, durante a sessão, como praticar as mudanças que fez na mente, usando cenas que ele mesmo descreveu, para colocar em prática essa nova postura mental.",1)}`},
+ {n:8,nome:"Finalização",curto:"Finalização",sub:"Encerrar com acolhimento e rapidez",
+  html:`<ul><li>Cuidado para não dar consolos e querer dar dicas finais: isso abre para a pessoa questionar ou trazer outra questão que acaba ficando em aberto, e ela não sai realizada e pronta para treinar;</li><li>Abra-se para responder, cuidar e marcar as próximas, mas busque que seja o mais acolhedor e rápido possível;</li><li>Agora é mais sobre “gratidão, prazer te conhecer, que bom que você decidiu isso, quero notícias”;</li><li>Nada de mais treino;</li><li>Nem dizer o que ela precisa ver ou o que fazer depois.</li></ul>`},
+ {k:"pos",tipo:"marco",nome:"Pós-terapia",curto:"Pós-terapia",sub:"Depois da sessão",
+  html:`${call("Combinado com o grupo","“Conte com o grupo se você tiver dúvida de como praticar.”")}<p>Não disponibilize o grupo como grupo de madrinhagem, de ajudas constantes. Nada disso.</p>
+  ${call("Um dia depois da sessão","Pergunte ao paciente como ele está e como ficou depois do nosso encontro.")}
+  ${call("Atenção","No pós-terapia, não evoluímos o paciente: não damos novos treinos mentais nem práticos. Só o ajudamos a praticar o que ele já viu em terapia. Se ele trouxer um tema novo, que não foi abordado na sessão, convide-o para uma próxima sessão.",1)}
+  <p style="font-family:var(--display);font-size:24px;color:var(--p1)">Agora é terapia!</p>`},
+ {k:"proc",tipo:"marco",nome:"Cuidando de processos",curto:"Processos",sub:"As próximas sessões",
+  html:`<div class="formato"><div><b>Duração</b><span>1 hora por sessão</span></div><div><b>O que muda</b><span>O tempo de investigação</span></div></div>
+  <p>A cada sessão, o paciente recebe <b>um novo treinamento mental</b> e <b>um novo treinamento prático</b>.</p>
+  <p>A exposição também pode ser uma unificação do que ele já viu nas sessões anteriores.</p>
+  ${call("Exemplo","Se o paciente já teve a exposição de que tem o arquétipo de irmão mais velho, na próxima sessão é possível relembrar o irmão mais velho com algum acréscimo: um irmão mais velho com uma ferida emocional X, um irmão mais velho adotado, um irmão mais velho provedor.")}
+  <div class="call att"><b>Na Fase 5</b><p>Os terapeutas terão aulas e oficinas para aprender a cuidar de processos.</p></div>`}
+];
+
+// posições
+let x=110; S.forEach((s,i)=>{ if(i>0) x+= (s.tipo==="marco"||S[i-1].tipo==="marco")?150:140; s.x=x; });
+const W=x+110, H=400;
+const Y=xx=>238+30*Math.sin(xx/170);
+const ang=xx=>Math.atan2(Y(xx+2)-Y(xx-2),4)*180/Math.PI;
+S.forEach(s=>{s.y=Y(s.x);s.a=ang(s.x);});
+const svg=document.getElementById("trail"); svg.setAttribute("width",W); svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+function el(t,a,p){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function line(x0,x1){let d="";for(let xx=x0;xx<=x1;xx+=8)d+=(d?"L":"M")+xx.toFixed(1)+" "+Y(xx).toFixed(1);return d+"L"+x1+" "+Y(x1).toFixed(1);}
+let gd=line(0,W).replace(/([ML])([\d.]+) ([\d.]+)/g,(m,c,a,b)=>c+a+" "+(+b+40).toFixed(1))+` L${W} ${H} L0 ${H}Z`;
+el("path",{d:gd,class:"ground"},document.getElementById("groundG"));
+document.getElementById("faint").setAttribute("d",line(40,W-40));
+function wrap(t,max){const w=t.split(" "),o=[];let c="";w.forEach(x=>{if((c+" "+x).trim().length>max&&c){o.push(c);c=x;}else c=(c+" "+x).trim();});if(c)o.push(c);return o;}
+
+const stepsG=document.getElementById("steps");
+let dragMoved=false;
+S.forEach((s,i)=>{
+  const g=el("g",{class:"step"+(s.tipo==="marco"?" marco":""),tabindex:"0",role:"button","aria-label":(s.n?"Passo "+s.n+": ":"")+s.nome},stepsG);
+  el("title",{},g).textContent=s.nome; s.g=g;
+  const rot=s.a+90;
+  if(s.tipo==="marco"){
+    el("circle",{cx:s.x,cy:s.y,r:26,class:"halo"},g);
+    el("circle",{cx:s.x,cy:s.y,r:14,class:"dot"},g);
+    const t=el("text",{x:s.x,y:s.y+46,class:"mtxt"},g); t.textContent=s.curto;
+  } else {
+    el("circle",{cx:s.x,cy:s.y,r:34,class:"halo"},g);
+    // dois pés lado a lado: a dupla de terapeutas
+    [-1,1].forEach(side=>{
+      const inner=el("g",{transform:`translate(${s.x} ${s.y}) rotate(${rot.toFixed(1)}) translate(${side*11} ${side*6}) scale(${side<0?-0.72:0.72} 0.72) translate(-15 -36)`},g);
+      el("use",{href:"#foot",class:side<0?"foot":"foot2"},inner);
+    });
+    const by=s.y+50;
+    el("circle",{cx:s.x,cy:by,r:12,class:"bub"},g);
+    const t=el("text",{x:s.x,y:by+4,class:"num"},g); t.textContent=s.n;
+    wrap(s.nome,13).forEach((ln,k)=>{const tn=el("text",{x:s.x,y:by+28+k*13,class:"sname"},g); tn.textContent=ln;});
+  }
+  el("rect",{x:s.x-55,y:s.y-50,width:110,height:150,fill:"transparent"},g);
+  g.addEventListener("click",()=>{ if(!dragMoved) select(i,true); });
+  g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();select(i,true);} });
+});
+
+const range=document.getElementById("range"); range.max=S.length-1;
+const scroller=document.getElementById("scroller");
+let cur=2;
+function select(i,center){
+  cur=Math.max(0,Math.min(S.length-1,i)); range.value=cur; const s=S[cur];
+  S.forEach((t,j)=>{t.g.classList.toggle("future",j>cur);t.g.classList.toggle("current",j===cur);});
+  document.getElementById("walk").setAttribute("d",s.x>40?line(40,s.x):"");
+  const m=document.getElementById("marker"), txt=m.querySelector("text");
+  txt.textContent="A sessão está aqui · "+s.nome;
+  const ty=70, topY=s.y-(s.tipo==="marco"?30:42);
+  txt.setAttribute("y",ty+5);
+  const bw=txt.getComputedTextLength()+22, bx=Math.max(8,Math.min(W-bw-8,s.x-bw/2));
+  txt.setAttribute("x",bx+11);
+  const r=m.querySelector("rect"); r.setAttribute("x",bx);r.setAttribute("y",ty-13);r.setAttribute("width",bw);r.setAttribute("height",26);
+  const ln=m.querySelector("line"); ln.setAttribute("x1",s.x);ln.setAttribute("x2",s.x);ln.setAttribute("y1",ty+13);ln.setAttribute("y2",topY);
+  const c=m.querySelector("circle"); c.setAttribute("cx",s.x); c.setAttribute("cy",topY);
+  if(center) scroller.scrollTo({left:s.x-scroller.clientWidth/2,behavior:reduce?"auto":"smooth"});
+  document.getElementById("where").innerHTML = s.n ? `<b>Passo ${s.n} de 8</b> · Terapia da Comunicação` : `<b>${s.k==="pre"?"Antes da sessão":s.k==="pos"?"Depois da sessão":"Próximas sessões"}</b>`;
+  document.getElementById("lesson").textContent=s.nome;
+  document.getElementById("sub").textContent=s.sub;
+  document.getElementById("content").innerHTML=s.html;
+  const carry=document.getElementById("carry");
+  const done=S.slice(0,cur);
+  carry.innerHTML = done.length ? `<div class="chips">${done.map((d,j)=>`<button class="chip" data-i="${j}">${d.n?`<b>${d.n}</b> `:""}${d.nome}</button>`).join("")}</div>` : `<p class="empty">Ainda nada. Este é o começo do caminho.</p>`;
+  carry.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>select(+b.dataset.i,true)));
+  const nx=S[cur+1];
+  document.getElementById("nextline").innerHTML = nx ? `Próximo passo: <b>${nx.nome}</b><br><button id="goNext">Ir para o próximo passo →</button>` : `Fim do caminho da sessão.`;
+  document.querySelectorAll("#content [data-open]").forEach(b=>b.addEventListener("click",()=>{const d=document.getElementById(b.dataset.open); if(d){d.open=true; d.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});}}));
+  const gn=document.getElementById("goNext"); if(gn) gn.addEventListener("click",()=>select(cur+1,true));
+}
+
+let down=false,sx=0,sl=0;
+scroller.addEventListener("pointerdown",e=>{if(e.pointerType==="touch")return;down=true;dragMoved=false;sx=e.clientX;sl=scroller.scrollLeft;});
+window.addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-sx;if(Math.abs(dx)>4){dragMoved=true;scroller.classList.add("dragging");}if(dragMoved)scroller.scrollLeft=sl-dx;});
+window.addEventListener("pointerup",()=>{down=false;scroller.classList.remove("dragging");setTimeout(()=>dragMoved=false,0);});
+scroller.addEventListener("keydown",e=>{if(e.key==="ArrowRight"){e.preventDefault();select(cur+1,true);}if(e.key==="ArrowLeft"){e.preventDefault();select(cur-1,true);}});
+range.addEventListener("input",()=>select(+range.value,true));
+document.getElementById("prev").addEventListener("click",()=>select(cur-1,true));
+document.getElementById("next").addEventListener("click",()=>select(cur+1,true));
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>select(cur,false));
+select(cur,false);
+
+
+// arquétipos
+const hD=t=>`<p class="arq-def">${t}</p>`;
+const hBox=(t,inner,cls)=>`<div class="box${cls?" "+cls:""}"><h4>${t}</h4>${inner}</div>`;
+const hP=a=>a.map(x=>`<p>${x}</p>`).join("");
+const hUl=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+const hTwo=(...b)=>`<div class="two">${b.join("")}</div>`;
+const hQ=(t,c)=>`<p class="arq-quote">${t}${c?`<cite>${c}</cite>`:""}</p>`;
+const hBig=t=>`<p style="font-family:var(--display);font-size:20px;line-height:1.35">${t}</p>`;
+const FASE3="Fase 3 · Consolidação do Aprendizado";
+const FILHOS=[
+ {nome:"Filho mais velho",a:["Responsabilidade pelas pessoas e pelos acontecimentos.","Função de ensinar, orientar e mostrar como se faz.","Necessidade de ser exemplo.","Responsabilidade pelas atitudes e escolhas dos outros.","Facilidade de assumir a culpa.","Reprodução dos comportamentos dos pais.","Necessidade de honrar e corresponder aos pais.","Dificuldade de pedir e receber ajuda.","Comunica para ensinar, corrigir e orientar.","Medo de ser ríspido e agressivo na comunicação.","Tendência a se retirar para não atacar, na vontade de proteger.","Antecipação de problemas e necessidades.","Necessidade de ser útil e resolver.","Dificuldade de pertencer sem assumir uma função."],
+  mundo:"Identifica quem precisa de ajuda, quem precisa aprender, o que está fora do lugar e o que ele precisa resolver. Em vez de perguntar “qual é minha utilidade aqui?”, tende a perguntar: “pelo que eu sou responsável aqui?”",
+  saida:"Se abra para aprender, receber colo e contar o que sente. Ter irmãos não significa virar pai deles."},
+ {nome:"Filho do meio",a:["Sensação de não pertencimento.","Sensação de ser “o diferente” da família.","Aparência mais descolada, independente ou rebelde.","Lugar de “cola” da família.","Responsabilidade de conectar os irmãos.","Necessidade de transitar entre os diferentes lados.","Dificuldade de identificar o próprio lugar.","Facilidade de se sentir deslocado ou deixado de lado.","Necessidade de agradar sem demonstrar que quer agradar.","Sensibilidade à rejeição e à falta de consideração.","Comunicação melindrosa e distante.","Cobrança por dar mais carinho e atenção.","Distanciamento como forma de lidar com a necessidade de afeto.","Dificuldade de se sentir importante.","Desejo de ser incluído sem precisar pedir inclusão.","Necessidade de perceber que faz falta."],
+  mundo:"Entra nos lugares tentando descobrir onde cabe, quem precisa ser conectado e como pode fazer parte sem precisar pedir espaço, geralmente tentando se provar bom em alguma coisa. Quer ser lembrado, escolhido e incluído, mas pode se afastar antes de correr o risco de perceber que não foi. Em vez de perguntar “eu sou necessário aqui?”, tende a perguntar: “será que existe um lugar para mim aqui?”",
+  saida:"Assuma a sua doçura e conte que você realmente quer estar com todos. Ter irmãos não é uma competição."},
+ {nome:"Filho mais novo",a:["Necessidade de crescer e se provar.","Busca por reconhecimento da própria grandeza.","Necessidade de proteção e incômodo ao se sentir protegido.","Medo de ser diminuído ou infantilizado.","Necessidade de orgulhar as pessoas.","Desejo de ser excepcional sem ultrapassar os irmãos.","Discordância como forma de demonstrar força e individualidade.","Necessidade de fazer diferente para provar que cresceu.","Sensação de ter muitas pessoas opinando sobre sua vida.","Sensação de sair perdendo ou ter menos poder de decisão.","Busca por autonomia e independência.","Vontade de agradar e ser admirado.","Dificuldade de lidar com as “coisas do mundo”, como se fosse “blindado”.","Sempre acha que não é levado a sério.","Necessidade de ser ouvido e dificuldade de ouvir.","Acredita que satisfação é sintoma de dependência.","Pensa que insatisfação é sinônimo de progresso.","Busca por diferenciação para construir o próprio lugar."],
+  mundo:"Entra nos lugares procurando quem pode protegê-lo, reconhecê-lo e admirá-lo, mas, quando alguém tenta orientá-lo, pode sentir que estão diminuindo sua capacidade. As pessoas viram “irmãos mais velhos” diante dos quais ele precisa provar que cresceu, que sabe e que consegue fazer do próprio jeito. Por isso, pode usar a discordância e a diferença como afirmação de grandeza: “se eu fizer como vocês, como vou provar que cresci?”",
+  saida:"Confie, agradeça e assuma a sua grandeza agora. Ter irmãos não te obriga a ser forte sozinho."},
+ {nome:"Filho único",a:["Sensação de que tudo é sobre ele.","Responsabilidade pelo que dá certo e pelo que dá errado.","Necessidade de agradar e orgulhar os pais.","Busca por uma imagem de perfeição.","Pode parecer mimado por dificuldade de ouvir não.","Medo de decepcionar.","Dificuldade de mostrar fragilidades e imperfeições.","Comunicação mais protegida e misteriosa.","Sensação de que as pessoas não o conhecem por inteiro.","Necessidade de se sentir único e especial.","Dificuldade de dividir pessoas, atenção e afeto.","Necessidade de exclusividade nas relações.","Medo de brigas, conflitos e desentendimentos.","Tendência a interpretar reações alheias como relacionadas a ele.","Medo da intensidade emocional das pessoas.","Sensação de que sentimentos podem gerar conflitos.","Necessidade de controlar a própria imagem e o ambiente."],
+  mundo:"Como cresceu no centro daquela relação, pode entrar nos lugares sentindo que os movimentos das pessoas têm alguma relação com ele: se alguém está feliz, pode ter sido por ele; se alguém está incomodado, talvez seja culpa dele. Busca relações em que se sinta único e pode ter dificuldade quando precisa dividir atenção, afeto ou importância. Ao mesmo tempo, tenta manter tudo em harmonia, porque o conflito ameaça sua sensação de segurança e sua imagem de “bom filho”. Em vez de simplesmente perceber “as pessoas estão sentindo coisas”, pode interpretar: “o que isso tem a ver comigo e o que eu preciso fazer para ficar tudo bem?”",
+  saida:"Aprenda a contar com as pessoas e decidir junto. Ter irmãos não te tira nada."}
+];
+const A=[
+ {nome:"Conceito de arquétipo",fase:FASE3,html:
+  hD("O que é arquétipo?")+
+  hBox("Segundo Jung",hQ("“A ideia de conjunto de imagens primordiais, que são inventadas e alimentadas como verdade de uma geração para outra.”")+hQ("“É um conceito que representa o primeiro modelo de algo, protótipo, ou antigas impressões sobre algo.”")+hQ("“Conjuntos de imagens primordiais que dão sentido aos complexos mentais e às histórias passadas entre gerações, formando o conhecimento e o imaginário do inconsciente coletivo; agem como estruturas inatas, imateriais, com que os fenômenos psíquicos tendem a se moldar, e servem de matriz para a expressão e desenvolvimento da psique.”")+hQ("“O ser humano é controlado e influenciado pelo poder dos arquétipos.”","Jung"))+
+  hTwo(hBox("Arquétipos e personalidade",hP(["Toda personalidade tem como base estruturas arquetípicas e seus respectivos registros antropológicos.","Toda personalidade tem como base valores pautados no nada."])),
+       hBox("No treinamento mental",hBig("Vamos treinar nos libertar dos arquétipos, decidindo a cada segundo parar de interpretar personagens e repetir padrões para conhecer a verdadeira espontaneidade.")+hP(["O “suporte” da liberdade são os exercícios do UCEM, e o treinamento de quebrar padrões é o estabelecido pela aula da semana."]),"orange"))},
+ {nome:"Arquétipo de Mestre",fase:FASE3+" · Aula 2",html:
+  hD("O mestre é aquele que preza por indicar condutas de ações e formas de “ser” aos outros com base em sua própria experiência e ser destacado de alguma forma.")+
+  hTwo(hBox("De onde vem o personagem",hP(["A vontade de encontrar um formato para o que é verdadeiro nos fez interpretar um papel estereotipado."])),
+       hBox("O que ele causa",hP(["Desejar ser obedecido e admirado pela sua personalidade vai te afastar das pessoas, ou convidar o outro a se frustrar com você e a te culpabilizar pelas decisões dele.","E o pior é você não se sentir útil, necessário ou bem-vindo quando você não se sente em condições de “ensinar”."])))+
+  hTwo(hBox("O medo por trás",hP(["O medo é a base desse personagem, assim como de qualquer outra crença antropológica.","O seu medo precisa ser acolhido. O seu medo precisa ser compreendido.","Só é possível parar de imaginar se libertando da estrutura vê benefícios na imaginação."])),
+       hBox("Como cuidar",hBig("Não precisamos culpar. Precisamos acolher e ajudar a reconhecer a insegurança para caminharmos juntos para o amor."),"orange"))+
+  hBox("A saída",hBig(`A postura do professor de Deus: <span style="color:var(--p1)">aprendiz.</span>`)+hQ("“A única responsabilidade daquele que trabalha em milagres é aceitar a Expiação para si mesmo. Isso significa que reconheces que a mente é o único nível criativo e que os erros que ela comete são curados pela Expiação. Uma vez que aceitas isso, a tua mente só pode curar. Negando à tua mente qualquer potencial destrutivo e reempossando-a dos seus poderes puramente construtivos, tu te colocas em posição de desfazer a confusão de níveis dos outros. A mensagem que então lhes dás é a verdade de que as suas mentes são similarmente construtivas, e suas criações equivocadas não podem feri-los. Afirmando isso, liberas a mente da supervalorização do seu próprio instrumento de aprendizado e a restauras à sua verdadeira posição como aprendiz.”","Um Curso em Milagres · “A função do trabalhador de milagres”"),"dark")},
+ {nome:"Arquétipo de irmãos",fase:FASE3+" · Ordem de nascimento",html:
+  hD("Por não se ver como igual, você nasceu em uma ordem específica para sentir o que já queria.")+
+  hBox("Como o personagem se sustenta",hP(["O ego gosta de achar que ele sabe o que as pessoas esperam dele para que ele possa se comportar de uma forma que reforce suas ideias. Dessa maneira, consegue provocar um ambiente que entrega o que ele precisa para manter as cobranças que sustentam o personagem."]))+
+  `<div class="subtabs" role="tablist" aria-label="Ordem de nascimento">${FILHOS.map((f,i)=>`<button class="tab sub" data-f="${i}" role="tab">${f.nome}</button>`).join("")}</div><div id="filhoBody"></div>`+
+  hBox("No treino mental",hTwo(`<div><h4 style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-text)">Mais velho</h4><p>Não ouvir um irmão mais velho deixa o processo mais lento, demorado e sofrível.</p></div>`,`<div><h4 style="margin:0 0 4px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold-text)">Mais novo</h4><p>Não ouvir um irmão mais novo deixa o processo solitário, não inclusivo e com pouca motivação.</p></div>`))+
+  hBox("A saída",hBig("A verdadeira irmandade é aceitar cuidar e ser cuidado em igualdade.")+hP(["Se você aprender isso, vai parar de transformar todos os ambientes na casa dos seus pais.","A verdadeira irmandade é uma motivação para quem quer transcender."]),"orange")+
+  hBox("Um Curso em Milagres",hQ("“Os meus irmãos são ilimitados em suas dádivas para mim. Que eu ofereça-lhes os meus agradecimentos agora para que a gratidão para com eles possa me levar adiante, em direção ao meu Criador e à Sua memória.”","Um Curso em Milagres"),"dark")},
+ {nome:"Arquétipo de pai e mãe",fase:FASE3,html:
+  hD("Arquétipo de pai e mãe não são os pais de pessoas, mas sim de ideias.")+
+  hTwo(hBox("Só ideias precisam de defesas",hP(["Se você é o dono dessa ideia no mundo, você tenta protegê-la."])),
+       hBox("O amor está sempre presente",`<ol><li>O ego promete “entregar esse amor” por meio de “boas intenções”.</li><li>As “boas intenções” são estratégias de manutenção do ego, da ideia de separação.</li><li>E assim assistimos às expressões de culpa, e não de amor.</li></ol>`))+
+  hTwo(hBox("Como a mãe se expressa",hUl(["Proteção","Agradabilidade","Facilitando a vida da pessoa","Controladora","Crítica velada","Dominando a cena","Manipulação","Conselheira","Superioridade","Quer fazer do jeito dela","Salvadora","Quer dar seu jeitinho","Fazer pelo outro","O seu escolhido é o melhor","Persuasiva","Superprotetora","Acha que sabe o que é melhor para o outro","Elogia, mas mostrando que dá pra ser melhor","Preocupação","Disfarçada de boazinha","Pena","Raiva contida","Diminui o outro","Cobrança","“Eu que cuido de você”","“Você tem que me escutar”","“Sempre me sacrifiquei por você!”"])),
+       hBox("Como o pai se expressa",hUl(["Impaciente","Resolutivo","Distante","Arrogante","“Eu te protejo”","Superioridade","Pouca clareza","Parece preocupado, só que não","Praticidade","Egoísmo","Irritabilidade","“Não me avisaram na minha vez”","Impositor","Direção","Não quer se comprometer","“Perguntou pra sua mãe?”","Não ouve","Considera ser a única forma de segurança","Autoridade","Assédio","Medo","Se envolve, mas nem tanto","Colocando medo pra se autoafirmar","Falta de confiança","Já chega impondo e afirmando","Promete uma segurança e depois abandona","Não lida","Tarefeiro","Falta de posicionamento e imparcialidade","Cuidado disfarçado","Foge das responsabilidades","Coloca fogo no parquinho e sai correndo"])))+
+  hBox("Por que queremos corrigir, proteger, aconselhar, salvar",hP(["A vontade de corrigir, proteger, aconselhar, salvar… só pode vir de uma mente que acredita que o outro está vulnerável.","E se o outro é vulnerável, é porque de alguma forma você vê culpa em vez de inocência.","E se você vê culpa, é porque tem algum valor seu projetado na outra pessoa do qual você tem medo de abrir mão.","Isso gera sensação de culpa e medo. E, por não ser um valor verdadeiro, também não ajuda a pessoa a se curar. Assim, ela continua insatisfeita e você continua preocupado “com ela”."]))+
+  `<div class="dpara2"><div class="box"><h4>O que os pais expressam</h4>${hUl(["Dependência","Culpa como motivação","Preocupação como proteção","Correção no fazer","Impõe limites","Atesta pequenez/vitimização","Medo de mudanças"])}</div><span aria-hidden="true">→</span><div class="box dark"><h4>O que os professores de Deus demonstram</h4>${hUl(["Liberdade","Inocência como motivação","Amor como proteção","Correção nas ideias e nas sensações","Tira limites","Atesta grandeza/titularidade","Estimulam mudanças e transformações"])}</div></div>`+
+  hBox("A saída",hBig("Se você não protege ideias, você liberta pessoas.")+hP(["Essa prioridade te faz colocar o Amor à frente de qualquer valor."]),"orange")+
+  hBox("Para estudar",hQ("“Sempre que o medo se introduzir em qualquer lugar ao longo da estrada para a paz, isso se deve ao ego ter tentado unir-se a nós nessa jornada e não poder fazê-lo. Sentindo a derrota e enraivecido por isso, o ego se considera rejeitado e vem a ser vingativo. És invulnerável à vingança do ego porque eu estou contigo. Nessa jornada, me escolheste como teu companheiro ao invés do ego. Não tentes apegar-te aos dois, ou estarás tentando ir em direções diferentes e perderás o caminho. O caminho do ego não é o meu, mas também não é o teu. O Espírito Santo tem uma direção para todas as mentes e aquela que Ele me ensinou é a tua. Não percamos de vista a Sua direção por meio de ilusões, pois apenas as ilusões de outra direção podem obscurecer aquela pela qual a Voz de Deus fala em todos nós. Nunca conceda ao ego o poder de interferir com a jornada. Ele não tem nenhum, porque a jornada é o caminho para o que é verdadeiro.”")+hQ("“A decisão de receber é a decisão de aceitar. Se os teus irmãos são parte de ti, vais aceitá-los? Só eles podem ensinar-te o que tu és, pois o teu aprendizado é o resultado do que lhes ensinaste. O que invocas neles é o que invocas em ti mesmo. E na medida em que tu o invocas neles, vem a ser real para ti. Deus tem apenas um Filho, conhecendo a todos como um só. Só o Próprio Deus é mais do que eles, mas eles não são menos do que Ele é. Queres conhecer o que isso significa? Se o que fazes ao meu irmão, fazes a mim e se fazes tudo a ti mesmo porque nós somos parte de ti, tudo o que nós fazemos também pertence a ti. Cada um que Deus criou é parte de ti e compartilha a Sua glória contigo.”","Um Curso em Milagres")+hQ("“O significado de Deus é incompleto sem ti e tu és incompleto sem as tuas criações. Aceita o teu irmão nesse mundo e não aceites nenhuma outra coisa, pois nele acharás as tuas criações porque ele as criou contigo. Nunca saberás que és cocriador com Deus enquanto não aprenderes que o teu irmão é cocriador contigo.”","Um Curso em Milagres · “A aceitação do teu irmão”"),"dark")}
+];
+function renderFilho(i){
+  const f=FILHOS[i], el=document.getElementById("filhoBody"); if(!el) return;
+  el.innerHTML=`<div class="box"><h4>${f.nome}</h4>${hUl(f.a)}</div>`+hTwo(hBox("Como leva isso para o mundo",hP([f.mundo])),hBox("A saída para o "+f.nome.toLowerCase(),hBig(f.saida),"orange"));
+  document.querySelectorAll("#bodyA .tab.sub").forEach((b,j)=>b.setAttribute("aria-selected",j===i?"true":"false"));
+}
+function renderA(i){
+  const a=A[i];
+  document.getElementById("bodyA").innerHTML=`<p class="arq-fase">${a.fase}</p><p class="big">${a.nome}</p>${a.html}`;
+  document.querySelectorAll("#tabsA .tab").forEach((b,j)=>b.setAttribute("aria-selected",j===i?"true":"false"));
+  const subs=document.querySelectorAll("#bodyA .tab.sub");
+  if(subs.length){ subs.forEach(b=>b.addEventListener("click",()=>renderFilho(+b.dataset.f))); renderFilho(0); }
+}
+A.forEach((a,i)=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.textContent=a.nome;b.addEventListener("click",()=>renderA(i));document.getElementById("tabsA").appendChild(b);});
+renderA(0);
+
+// feridas
+const F=[
+ {nome:"Rejeição",desc:"Assim como todas as feridas, ela coloca no ambiente a própria ferida: primeiramente é ela quem rejeita o ambiente, as coisas, as pessoas, as situações. Tem tendências à compulsão e à obsessão. Só para (de pensar, de comer, de estar com alguém) quando satura, enjoa e não aguenta mais, assim rejeitando o sujeito em questão. Pensa em usar/consumir até chegar ao fim, até não aguentar mais, até se esvair. Posteriormente, sente que está sofrendo os efeitos da rejeição.",
+  slogan:"“Eu não preciso de ninguém para arrasar, eu arraso sozinho.”",dif:"Aceitar ser gostado.",desperta:"raiva",
+  amb:"A pessoa mais legal do ambiente. Geralmente chega tendo atenção, sendo legal, íntima, falando com todos. As pessoas falam que ela é incrível, porém ela não acredita. Tem sensação basal de superioridade; transita entre ser endeusada ou depreciada.",
+  din:"Tem facilidade em ganhar dinheiro e fontes de renda: existe fluidez na entrada, mas também na saída, sem receio de despender para qualquer fim. Não tem apego ao dinheiro em si, mas ao que ele proporciona. Rejeita ficar sem dinheiro, mas não entra em dívidas.",
+  a:["A pessoa está triste, mas não está no fundo do poço","O cuidado se dá com bom humor, piadas, fazendo-a rir; tem facilidade em rir de si mesma."],
+  b:["A pessoa está muito mal (tende ao combate)","Conte para ela que não é má, acolha-a carinhosamente com o intuito de inocentar o quanto está se sentindo mal. Geralmente é quando já chegou no esgotamento da obsessão."],
+  treino:"“O seu paciente já te convidou. Você é bem-vindo na vida dele, pode se colocar à disposição sem medo.”"},
+ {nome:"Traição",desc:"Assim como todas as feridas, o paciente se trai e trai os compromissos mentais que fez consigo e com o outro, e depois desconfia das pessoas, como se elas fossem passíveis de traí-lo. Tende a ser desconfiado e gera desconfiança. Normalmente as pessoas acham que ele não vai cumprir seus compromissos, ou que ao fazê-los estará triste ou mal-humorado.",
+  slogan:"“Eu falei que gosto, mas não gosto”, enquanto, na verdade, só queria ajuda para sua insatisfação.",dif:"Assumir que precisa ser mais confiável.",desperta:"raiva",
+  amb:"Tem sensação basal de desconfiança, acha que não gostam dela. Gera sensação de insatisfação, ingratidão, dívida e desconfiança.",
+  din:"Fala que não tem dinheiro para necessidades básicas; age de forma a, por fim, não ter dinheiro. Sempre acha que não vai ter dinheiro suficiente, desconfia do que já planejou e muitas vezes vê acontecer o cenário que já havia imaginado.",
+  a:["A pessoa está triste, mas não está no fundo do poço","Leve a visão de que é ela mesma que está se traindo."],
+  b:["A pessoa está muito mal (tende ao isolamento)","Geralmente precisa de pequenos “puxões de orelha”. A depender do nível de intimidade, pode ser: “estou te contando, mas se você não quiser, você é livre para escolher”."],
+  treino:"“Você pode gostar sem medo de se decepcionar.”"},
+ {nome:"Abandono",desc:"Seu maior medo é assumir compromissos, pois tem medo de ser abandonado futuramente. Demonstra não se importar muito, tem medo de demonstrar apego, pois, caso sinta necessidade de abandonar (por medo, abandona antes de ser abandonado), já está engatilhado. Em relação a elogios, encara como cobrança; aceita o elogio como verdade, mas deixa claro que foi pontual. Tem medo de ser mais solicitado, de firmar compromisso. Quem dita os limites e os fazeres é ela mesma.",
+  slogan:"",dif:"",desperta:"dó ou distância",
+  amb:"Sensação de não intimidade, de mente escondida e de medo de invadir. As pessoas costumam achar que ela vai abandonar, ir embora ou desistir do compromisso: sensação de que não se importa ou não se envolve muito.",
+  din:"Existe uma lógica própria, funciona, mas não se sabe como. Não precisa sobrar, só não pode faltar. Frases como “não é que eu gaste muito, é que eu uso quando preciso”; “não é que eu guarde, eu fui guardando”. Se demora demais para se definir e é pouco enfática, é abandono.",
+  a:["A pessoa está triste, mas não está no fundo do poço","Lembre-a de que continua livre, que ainda pode fazer o que quiser, nada a prende; que não está sendo cobrada, que as pessoas não estão esperando coisas dela."],
+  b:["A pessoa está muito mal (tende ao isolamento e prestes a abandonar)","Mostre o que ela não gostaria que acontecesse, concorde com a ideia do abandono mostrando aonde vai chegar, para que perceba sua insanidade."],
+  treino:"“Peça para ver que ficar e ser devoto é sua melhor decisão.”"},
+ {nome:"Humilhação",desc:"A pessoa com a ferida de humilhação tende a apresentar muita desesperança e desdém: “não aguento mais”, “não tem como”, “isso não é pra mim”, “então deixa, desisto”, ou finge que não se importa com assuntos que a mexem muito. Divide-se em dois perfis: aparenta estar numa situação sem solução, ou aparenta estar ótima mesmo diante de uma situação adversa. Conta histórias de dor e desgraça como se fossem rotineiras, sem dar a devida relevância. Coloca esperanças em locais e relacionamentos sem meta, em vez de nutrir os que já têm esse objetivo.",
+  slogan:"",dif:"",desperta:"raiva e indignação",
+  amb:"Vontade de dar bronca, de sacudir a pessoa, de até humilhá-la, mas na prática as pessoas tendem a desistir e se afastar para não lidar com a desesperança. Facilmente pensam: “ela não quer, não adianta”.",
+  din:"Altamente inclinada a fazer dívidas. Quando tem dinheiro, já pensa que nem sempre será assim, então aproveita para gastar, o que gera mais dívida e falta de organização financeira. Tende a pedir emprestado.",
+  a:["A pessoa está triste, mas não está no fundo do poço","Coloque-a em ação para o cuidado, sem deixar que se negligencie; coloque-a em mais esperança, contando coisas que ela mesma já disse."],
+  b:["A pessoa está muito mal (tende ao isolamento)","Encaminhe-a mais um pouco para dentro da sensação de humilhação, para que tenha vontade de sair da desesperança."],
+  treino:"“A esperança vem de você e dos seus relacionamentos que têm a meta na cura. Pode confiar!”"},
+ {nome:"Injustiça",desc:"Altamente críticos consigo mesmos, o que os leva a serem críticos com os outros. Têm vontade de fazer justiça, mas são injustos consigo mesmos, pois desconsideram suas sensações em prol da justiça. Para se defender, acabam atacando. Apresentam muita indignação e muitos argumentos, querem muito não estar errados e procuram o erro no externo.",
+  slogan:"",dif:"",desperta:"raiva",
+  amb:"Sensação de crítica, de que a pessoa dessa ferida está te podando, que você está errado: sensação de melindre.",
+  din:"Faz questão de guardar. Tenta ser esperto em poupar, mesmo que seja uma escolha ruim. Tem dificuldade em usar/gastar seu dinheiro; quando vai usar, só pensa em algo grande (um carro, um apartamento…). Sente medo de precisar usar o dinheiro guardado.",
+  a:["A pessoa está mal, mas acha que é dona da razão","Conte a ela o quanto está sendo injusta, o quanto os argumentos que tem em mente são injustos e que ela também agiu equivocadamente."],
+  b:["A pessoa está muito mal (tende ao combate)","Coloque mais carinho, ajude-a a se ver e se tratar mais carinhosamente, pois o nível de crítica já está alto demais."],
+  treino:"“A coisa mais justa é a pessoa se sentir inocente e amada. E você também!”"}
+];
+function renderF(i){
+  const f=F[i];
+  document.getElementById("bodyF").innerHTML=`<p class="big">${f.nome}</p><p style="margin:0;max-width:72ch">${f.desc}</p>
+   ${f.slogan?`<p class="slogan"><b style="font-family:var(--body);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:block">Slogan</b>${f.slogan}</p>`:""}
+   <div class="two">
+    ${f.dif?`<div class="box"><h4>Dificuldade</h4><p>${f.dif}</p></div>`:""}
+    <div class="box"><h4>Em ação, desperta nos outros</h4><p>A sensação de ${f.desperta}.</p></div>
+    <div class="box"><h4>O que causa no ambiente</h4><p>${f.amb}</p></div>
+    <div class="box"><h4>Como lida com dinheiro</h4><p>${f.din}</p></div>
+   </div>
+   <div class="grp" style="display:grid;gap:8px"><h4 class="kicker">Didáticas para cuidados com a ferida</h4>
+   <div class="two"><div class="box"><h4>A · ${f.a[0]}</h4><p>${f.a[1]}</p></div><div class="box"><h4>B · ${f.b[0]}</h4><p>${f.b[1]}</p></div></div></div>
+   <div class="box orange"><h4>Treino para o terapeuta</h4><p style="font-family:var(--display);font-size:20px;line-height:1.35">${f.treino}</p></div>`;
+  document.querySelectorAll("#tabsF .tab").forEach((b,j)=>b.setAttribute("aria-selected",j===i?"true":"false"));
+}
+F.forEach((f,i)=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.textContent=f.nome;b.addEventListener("click",()=>renderF(i));document.getElementById("tabsF").appendChild(b);});
+renderF(0);
+
+// perfis
+const P=[
+ {nome:"Amigável",carac:["É uma pacificadora nata, não gosta de conflitos;","É uma ótima ouvinte;","Voltada para pessoas;","Gosta de se identificar com a empresa;","É metódica;","Gosta de eficiência e planejamento;","Não gosta de mudanças de última hora;","Busca lealdade;","Decisões baseadas nos outros, na compaixão e na vontade de ver os outros felizes."],
+  com:["Direcionada a ouvir;","Cria confiança;","Fala calmamente;","Mais confortável na comunicação um a um;","Fala sobre temas que entende bem."],
+  forcas:["Trabalha bem em equipe;","Confiável e leal;","Busca harmonia;","Boa ouvinte;","Mantém ritmo constante."],
+  desafio:["Ser mais aberta a mudanças;","Ser mais direta nas interações;","Focar mais em objetivos gerais do que em procedimentos específicos de equipe;","Desenvolver flexibilidade;","Mostrar mais iniciativa;","Trabalhar mais em expressar pensamentos, opiniões e sentimentos."],
+  conflito:["Tendência a se esconder;","Cumpre o que precisa ser cumprido;","Cede para manter a paz e reduzir o conflito;","Demonstra concordar com os outros;","Tolerante mesmo não concordando;","Deseja salvar o relacionamento mesmo que se sinta ferida."],
+  pressao:"Se comporta como um dominador.",
+  conversar:["Comece pela relação e pelo acolhimento;","Fale com calma e empatia;","Mostre o impacto coletivo;","Traga segurança emocional;","Evite confrontos diretos e pressão."],
+  recebe:["Em conversas próximas;","Com sensações expressas e tom colaborativo;","Sem clima de urgência agressiva;","Quando explica e traz exemplos de como se sente."],
+  entrega:["Quando se sente seguro, reconhecido e pertencente;","Quando percebe harmonia e colaboração no ambiente;","Quando sabe que não estará sozinho;","Quando tem previsibilidade e sente que está ajudando as pessoas."],
+  motiva:"Ambientes colaborativos, relações de confiança, reconhecimento, sentir-se útil e necessário.",
+  desmotiva:"Quando se sente desconectado, não ouvido, invisível ou inseguro.",
+  frases:["“Quero ouvir como você se sente com essa demanda.”","“Sua contribuição é importante para a equipe.”"],
+  valores:["Comunicação","Relacionamento","Confiança","Método","Previsibilidade","Acolhimento","Escuta","Reconhecimento","Fazer junto","Colaboração"]},
+ {nome:"Analítico",carac:["É organizada e voltada para processo;","Tende a ser perfeccionista;","É sistemática nos relacionamentos;","Valoriza a verdade e a precisão;","Autoexigente e crítica;","Detalhista;","Não expressa opinião, somente se tiver certeza;","Decisões baseadas nos fatos e na lógica; compara experiências passadas e investiga."],
+  com:["Reservada e cautelosa;","Focada em prover informações detalhadas e com clareza;","Não fala de questões pessoais;","Não dá opinião sem ter certeza;","Ouvinte crítica se o tema não for apresentado logicamente."],
+  forcas:["Detalhista;","Pensa sistematicamente;","Utiliza lógica e fatos;","Alto controle de qualidade e precisão;","Tende a preferir trabalhar sozinha."],
+  desafio:["Foco em fazer o que tem que ser feito, não apenas até que saia o melhor possível;","Criticar menos ideias e métodos alheios;","Responder mais rapidamente para alcançar os objetivos da equipe;","Construir relacionamentos com a equipe;","Ser mais decisiva;","Focar menos nos fatos e mais nas pessoas;","Arriscar mais."],
+  conflito:["Tendência a se esconder;","Evita o conflito;","Fica menos assertiva;","Mantém os pensamentos para si mesma;","Mantém-se mais controlada e observadora;","Analisa pessoas e situações indesejáveis;","Planeja o próximo passo."],
+  pressao:"Se comporta como um expressivo.",
+  conversar:["Seja lógico, estruturado e objetivo;","Traga dados, fatos, números, contexto e critérios claros;","Explique o porquê antes do como;","Evite improvisos e excesso de emoção;","Dê tempo para pensar e processar."],
+  recebe:["Por escrito ou com sequência lógica e estruturada;","Com começo, meio e fim bem definidos (objetivo, processo e resultado esperado);","Sem pressão imediata por resposta."],
+  entrega:["Quando entende o contexto completo;","Quando sente segurança, previsibilidade e clareza;","Quando sabe exatamente o que se espera dele;","Quando o escopo está definido, com prazos realistas e critérios de qualidade."],
+  motiva:"Clareza de processos, segurança, previsibilidade, qualidade, reconhecimento pela competência, tempo para pensar, se preparar e produzir com eficiência e consistência.",
+  desmotiva:"Pressão por rapidez sem critério, falta de lógica ou incoerência, improviso excessivo, ambientes caóticos ou emocionais demais.",
+  frases:["“Analisando esses dados, temos três caminhos possíveis.”","“Gostaria da sua avaliação antes de decidir.”"],
+  valores:["Clareza","Qualidade","Método","Segurança","Organização","Comunicação efetiva","Excelência","Reconhecimento","Valorização"]},
+ {nome:"Dominador",carac:["Fica facilmente entediado;","Gosta de desafios, mudanças e de arriscar;","Sua avaliação é baseada nas realizações;","Direto, rápido e impaciente;","Cria altas expectativas em relação a si e aos outros;","Possui convicção elevada;","Pode ser enfático e exigente;","Decisões tomadas por instinto; faz ajustes em tempo real, age rapidamente."],
+  com:["Direta, pode até ser brusca;","Uma direção: a partir dele/dela para os outros;","Comunica sua própria visão e tem sua opinião como fato;","Focada no resultado, nada de conversa “fiada”;","Domina a comunicação;","Ouvinte impaciente, pode ser que nem dê ouvidos."],
+  forcas:["Direcionado para resultados;","Independente;","Agente de resolução criativa de problemas;","Direcionamento;","Visionário."],
+  desafio:["Ouvir mais e dar atenção às ideias dos outros colaboradores até que haja um consenso;","Ser menos controlador e dominador;","Ter mais energia nas relações pessoais;","Mostrar apoio aos outros;","Explicar o “porquê” das ideias e propostas;","Ser mais amigável; pedir desculpas;","Desenvolver maior interesse pelas opiniões, sentimentos e vontades dos outros."],
+  conflito:["Tendência a se expressar;","Demanda;","Extremamente assertivo;","Crítico;","Inflexível;","Exageradamente controlador;","Força de vontade para resolver;","Tentativa de impor emoções e pensamentos."],
+  pressao:"Se comporta como um analítico.",
+  conversar:["Vá direto ao ponto;","Fale de resultados, metas e prazos;","Seja firme e confiante;","Traga soluções, não problemas;","Evite rodeios e excesso de explicação."],
+  recebe:["De forma direta, rápida e objetiva;","Com foco em ação e decisão;","Em conversas curtas e assertivas."],
+  entrega:["Quando tem autonomia;","Quando vê desafio e impacto;","Quando sente que está avançando e tendo resultados;","Quando tem prazo e critério de sucesso."],
+  motiva:"Desafios, autonomia, ter poder de decisão, resultados visíveis, metas e objetivos, falar sobre soluções, ser confiado, foco e produtividade.",
+  desmotiva:"Burocracia, falta de clareza, dependência excessiva, sensação de estagnação, quando sente que perdeu impacto ou liberdade de ação.",
+  frases:["“Temos duas opções. Recomendo a segunda.”","“O impacto disso é X no resultado.”"],
+  valores:["Resultado","Autonomia","Impacto","Assertividade","Praticidade","Confiança","Clareza","Objetividade"]},
+ {nome:"Expressivo",carac:["Direcionada para pessoas;","Prefere liberdade a detalhes e controles;","É intuitiva;","Simpática e amiga;","Usa bem a linguagem verbal;","Age por impulso e emoção;","É confiante, persuasiva e carismática;","É entusiasta."],
+  com:["Muito falante;","Estilo inspirador e vendedor;","Fala de forma abrangente e evita detalhes;","Fala sobre pessoas e sentimentos;","Evita problemas desagradáveis;","Está programada a falar mais do que ouvir;","Muitas vezes não é direta."],
+  forcas:["Ótima comunicadora;","Motiva as outras pessoas a agir;","Promove pessoas e ideias;","Perspectivas positivas."],
+  desafio:["Ponderar os prós e contras antes das decisões;","Ser menos impulsiva;","Ser mais focada nos resultados;","Focar mais nos detalhes e nos fatos;","Falar menos e ouvir mais;","Considerar e avaliar ideias de outros membros da equipe;","Concentrar-se na realização das tarefas (uma coisa de cada vez)."],
+  conflito:["Tendência a se expressar;","Emocionalmente abalada (com pessoas e ideias);","Duvida das ações;","Fala para as pessoas como se sente;","Necessidade de explicar suas razões;","Se magoa, mas quer resolver;","Impulsividade exagerada."],
+  pressao:"Se comporta como um amigável.",
+  conversar:["Use entusiasmo, energia e conexão;","Traga visão e impacto;","Traga o “porquê” antes do “como”;","Deixe espaço para troca e ideias;","Use exemplos, histórias e metáforas;","Evite excesso de detalhes técnicos."],
+  recebe:["Em conversas abertas e dinâmicas;","Com espaço para falar e criar;","Conectada a pessoas e significados;","Em blocos curtos, com autonomia de execução e checkpoints."],
+  entrega:["Quando se sente visto, ouvido e valorizado;","Quando o trabalho tem sentido e inspiração;","Quando pode imprimir sua identidade;","Quando tem liberdade criativa, ambientes dinâmicos, desafios e reconhecimento público."],
+  motiva:"Novidade e variedade, reconhecimento, espaço para criar, intuição, interação social e troca com as pessoas, impacto, liberdade, ser valorizado pela ideia e não só pela execução.",
+  desmotiva:"Rotina rígida, excesso de regras, falta de escuta, ambientes frios ou controladores: isso gera perda de entusiasmo e presença.",
+  frases:["“Essa ideia tem potencial de impacto grande.”","“Imagina o resultado disso pronto.”"],
+  valores:["Liberdade","Criatividade","Expressão","Inspiração","Autonomia","Valorização","Reconhecimento","Conexão","Relacionamento","Comunicação"]}
+];
+const ul=a=>`<ul>${a.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+function renderP(i){
+  const p=P[i];
+  document.getElementById("bodyP").innerHTML=`<p class="big">${p.nome}</p>
+   <div class="box">${ul(p.carac)}</div>
+   <div class="two"><div class="box"><h4>Comunicação</h4>${ul(p.com)}</div><div class="box"><h4>Forças</h4>${ul(p.forcas)}</div>
+   <div class="box"><h4>Desafio</h4>${ul(p.desafio)}</div><div class="box"><h4>Diante do conflito</h4>${ul(p.conflito)}</div></div>
+   <div class="box orange"><h4>Sob pressão</h4><p style="font-family:var(--display);font-size:20px">${p.pressao}</p></div>
+   <h4 class="kicker" style="margin-top:6px">Como lidar com o perfil</h4>
+   <div class="two"><div class="box"><h4>Como conversar</h4>${ul(p.conversar)}</div><div class="box"><h4>Como recebe melhor a informação</h4>${ul(p.recebe)}</div>
+   <div class="box"><h4>Quando entrega melhor</h4>${ul(p.entrega)}</div><div class="box"><h4>O que motiva</h4><p>${p.motiva}</p><h4 style="margin-top:6px">O que desmotiva</h4><p>${p.desmotiva}</p></div></div>
+   <div class="box dark"><h4>Frases que funcionam</h4>${p.frases.map(f=>`<p style="font-family:var(--display);font-size:19px;line-height:1.35">${f}</p>`).join("")}</div>
+   <div style="display:grid;gap:8px"><h4 class="kicker">Valores do perfil</h4><div class="vals">${p.valores.map(v=>`<span>${v}</span>`).join("")}</div></div>`;
+  document.querySelectorAll("#tabsP .tab").forEach((b,j)=>b.setAttribute("aria-selected",j===i?"true":"false"));
+}
+P.forEach((p,i)=>{const b=document.createElement("button");b.className="tab";b.setAttribute("role","tab");b.textContent=p.nome;b.addEventListener("click",()=>renderP(i));document.getElementById("tabsP").appendChild(b);});
+renderP(0);
+})();
+</script>
+</body>
+</html>
