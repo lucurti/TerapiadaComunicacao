@@ -257,6 +257,43 @@ details.ex>summary:hover{background:var(--p1-soft)}
 .dpara2>span{font-size:28px;color:var(--gold)}
 @media (max-width:640px){.dpara2{grid-template-columns:1fr}.dpara2>span{justify-self:center;transform:rotate(90deg)}}
 @media (prefers-reduced-motion: reduce){ .step,.ex-ic{transition:none} }
+
+/* respiros em branco: fundamentos, conteúdo do passo e complementares em fundo claro; caminho, cabeçalho e "já passou por" seguem em azul-marinho */
+.fund,.card:not(.side),details.ex{
+  --bg:#F6FBFA; --surface:#FFFFFF; --ink:#0F2340; --muted:#3E5A66; --line:#CFE6E3;
+  --p1:#0B7A76; --p2:#0B7A76; --p1-soft:#E4F5F3;
+  --gold:#C4561C; --gold-text:#A8461A; --on-accent:#FFFFFF;
+  color:var(--ink); color-scheme:light;
+}
+.fund{background:var(--surface);border:0;border-radius:18px;padding:26px max(20px,3vw)}
+.fund .essencia{background:var(--p1-soft)}
+.fund .formato div{background:var(--p1-soft);color:var(--ink)}
+.fund .formato .warn{background:var(--gold);color:var(--on-accent)}
+.card:not(.side){background:var(--surface)}
+details.ex{background:var(--surface)}
+
+/* caminho: céu branco acima da onda, chão azul-marinho */
+.trail-box{background:#F6FBFA}
+.ground{fill:#17335C}
+.path-faint{stroke:#9DB8C4}
+.path-walk{stroke:#0B7A76;opacity:1}
+.foot{fill:#0F2340}
+.foot2{fill:#C4561C}
+.hint{background:#F6FBFA;color:#3E5A66}
+.scroller:focus-visible{outline-color:#0F2340}
+
+/* passos como bolinhas */
+.bub{fill:#0F2340;stroke:#81D8D0;stroke-width:2.5}
+.num{fill:#F2FAF9;font-size:14px}
+.step.current .bub{fill:#C4561C;stroke:#C4561C}
+.step.current .num{fill:#FFFFFF}
+.sname{font-size:12px}
+/* apoio ao terapeuta em tiffany */
+details.ex{
+  --bg:#81D8D0; --surface:#81D8D0; --ink:#0F2340; --muted:#1F3B50; --line:#5FBFB6;
+  --p1:#0F2340; --p2:#0F2340; --p1-soft:#B9EAE5;
+  --gold:#C4561C; --gold-text:#8A350E; --on-accent:#FFFFFF;
+}
 </style>
 </head>
 <body>
@@ -483,16 +520,10 @@ S.forEach((s,i)=>{
     el("circle",{cx:s.x,cy:s.y,r:14,class:"dot"},g);
     const t=el("text",{x:s.x,y:s.y+46,class:"mtxt"},g); t.textContent=s.curto;
   } else {
-    el("circle",{cx:s.x,cy:s.y,r:34,class:"halo"},g);
-    // dois pés lado a lado: a dupla de terapeutas
-    [-1,1].forEach(side=>{
-      const inner=el("g",{transform:`translate(${s.x} ${s.y}) rotate(${rot.toFixed(1)}) translate(${side*11} ${side*6}) scale(${side<0?-0.72:0.72} 0.72) translate(-15 -36)`},g);
-      el("use",{href:"#foot",class:side<0?"foot":"foot2"},inner);
-    });
-    const by=s.y+50;
-    el("circle",{cx:s.x,cy:by,r:12,class:"bub"},g);
-    const t=el("text",{x:s.x,y:by+4,class:"num"},g); t.textContent=s.n;
-    wrap(s.nome,13).forEach((ln,k)=>{const tn=el("text",{x:s.x,y:by+28+k*13,class:"sname"},g); tn.textContent=ln;});
+    el("circle",{cx:s.x,cy:s.y,r:27,class:"halo"},g);
+    el("circle",{cx:s.x,cy:s.y,r:18,class:"bub"},g);
+    const t=el("text",{x:s.x,y:s.y+5,class:"num"},g); t.textContent=s.n;
+    wrap(s.nome,13).forEach((ln,k)=>{const tn=el("text",{x:s.x,y:s.y+62+k*14,class:"sname"},g); tn.textContent=ln;});
   }
   el("rect",{x:s.x-55,y:s.y-50,width:110,height:150,fill:"transparent"},g);
   g.addEventListener("click",()=>{ if(!dragMoved) select(i,true); });
@@ -508,7 +539,7 @@ function select(i,center){
   document.getElementById("walk").setAttribute("d",s.x>40?line(40,s.x):"");
   const m=document.getElementById("marker"), txt=m.querySelector("text");
   txt.textContent="A sessão está aqui · "+s.nome;
-  const ty=70, topY=s.y-(s.tipo==="marco"?30:42);
+  const ty=70, topY=s.y-(s.tipo==="marco"?30:31);
   txt.setAttribute("y",ty+5);
   const bw=txt.getComputedTextLength()+22, bx=Math.max(8,Math.min(W-bw-8,s.x-bw/2));
   txt.setAttribute("x",bx+11);
