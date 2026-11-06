@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -281,6 +282,27 @@ details.ex{background:var(--surface)}
 .foot2{fill:#C4561C}
 .hint{background:#F6FBFA;color:#3E5A66}
 .scroller:focus-visible{outline-color:#0F2340}
+
+/* passos como bolinhas */
+.bub{fill:#0F2340;stroke:#81D8D0;stroke-width:2.5}
+.num{fill:#F2FAF9;font-size:14px}
+.step.current .bub{fill:#C4561C;stroke:#C4561C}
+.step.current .num{fill:#FFFFFF}
+.sname{font-size:12px}
+/* apoio ao terapeuta em tiffany */
+details.ex{
+  --bg:#F6FBFA; --surface:#FFFFFF; --ink:#0F2340; --muted:#3E5A66; --line:#CFE6E3;
+  --p1:#0B7A76; --p2:#0B7A76; --p1-soft:#E4F5F3;
+  --gold:#C4561C; --gold-text:#A8461A; --on-accent:#FFFFFF;
+}
+/* botões tiffany nos itens de apoio */
+details.ex .ex-ic{background:#81D8D0;color:#0F2340}
+details.ex .tab{background:#81D8D0;border-color:#81D8D0;color:#0F2340}
+details.ex .tab:hover{background:#6CCDC3;border-color:#6CCDC3}
+details.ex .tab[aria-selected="true"]{background:#0F2340;border-color:#0F2340;color:#FFFFFF}
+details.ex .tab.sub{background:#E4F5F3;border-color:#81D8D0}
+details.ex .tab.sub[aria-selected="true"]{background:#81D8D0;border-color:#0F2340;color:#0F2340}
+details.ex>summary:hover{background:#E4F5F3}
 </style>
 </head>
 <body>
@@ -507,16 +529,10 @@ S.forEach((s,i)=>{
     el("circle",{cx:s.x,cy:s.y,r:14,class:"dot"},g);
     const t=el("text",{x:s.x,y:s.y+46,class:"mtxt"},g); t.textContent=s.curto;
   } else {
-    el("circle",{cx:s.x,cy:s.y,r:34,class:"halo"},g);
-    // dois pés lado a lado: a dupla de terapeutas
-    [-1,1].forEach(side=>{
-      const inner=el("g",{transform:`translate(${s.x} ${s.y}) rotate(${rot.toFixed(1)}) translate(${side*11} ${side*6}) scale(${side<0?-0.72:0.72} 0.72) translate(-15 -36)`},g);
-      el("use",{href:"#foot",width:30,height:60,class:side<0?"foot":"foot2"},inner);
-    });
-    const by=s.y+50;
-    el("circle",{cx:s.x,cy:by,r:12,class:"bub"},g);
-    const t=el("text",{x:s.x,y:by+4,class:"num"},g); t.textContent=s.n;
-    wrap(s.nome,13).forEach((ln,k)=>{const tn=el("text",{x:s.x,y:by+28+k*13,class:"sname"},g); tn.textContent=ln;});
+    el("circle",{cx:s.x,cy:s.y,r:27,class:"halo"},g);
+    el("circle",{cx:s.x,cy:s.y,r:18,class:"bub"},g);
+    const t=el("text",{x:s.x,y:s.y+5,class:"num"},g); t.textContent=s.n;
+    wrap(s.nome,13).forEach((ln,k)=>{const tn=el("text",{x:s.x,y:s.y+62+k*14,class:"sname"},g); tn.textContent=ln;});
   }
   el("rect",{x:s.x-55,y:s.y-50,width:110,height:150,fill:"transparent"},g);
   g.addEventListener("click",()=>{ if(!dragMoved) select(i,true); });
@@ -532,7 +548,7 @@ function select(i,center){
   document.getElementById("walk").setAttribute("d",s.x>40?line(40,s.x):"");
   const m=document.getElementById("marker"), txt=m.querySelector("text");
   txt.textContent="A sessão está aqui · "+s.nome;
-  const ty=70, topY=s.y-(s.tipo==="marco"?30:42);
+  const ty=70, topY=s.y-(s.tipo==="marco"?30:31);
   txt.setAttribute("y",ty+5);
   const bw=txt.getComputedTextLength()+22, bx=Math.max(8,Math.min(W-bw-8,s.x-bw/2));
   txt.setAttribute("x",bx+11);
